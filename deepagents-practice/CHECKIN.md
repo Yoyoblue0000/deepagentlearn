@@ -9,15 +9,16 @@
 这次从一个简单的 Python 工具开始，先跑通 Agent 的工具调用，再把自己写的字符统计工具接进主应用，最后换几种输入看看结果。
 Lite、Basic、Advanced 三档都做了，下面按「想验证什么、做了什么、结果、理解、下一步」记录学习过程。
 
-| 档次 | 这次完成的内容 |
-| --- | --- |
-| Lite | 跑通第一个 Deep Agent，调用自己的工具，看懂「请求 → 执行 → 返回」 |
-| Basic | 启动主应用，接入 `count_num`，把模型、工具、Middleware、Backend 对应到代码 |
-| Advanced | 对比正常、空字符串、长文本输入，并留下 LangSmith Trace |
+
+| 档次     | 这次完成的内容                                                            |
+| -------- | ------------------------------------------------------------------------- |
+| Lite     | 跑通第一个 Deep Agent，调用自己的工具，看懂「请求 → 执行 → 返回」       |
+| Basic    | 启动主应用，接入`count_num`，把模型、工具、Middleware、Backend 对应到代码 |
+| Advanced | 对比正常、空字符串、长文本输入，并留下 LangSmith Trace                    |
 
 练习过程中使用了 AI 教练的提问和提示，实验脚本与工具代码由自己完成，打卡文档由 AI 协助整理。
 
-## 一、Lite：先跑通一个工具 Agent
+## 一、Lite
 
 ### 1.1 我想验证什么
 
@@ -28,11 +29,12 @@ Lite、Basic、Advanced 三档都做了，下面按「想验证什么、做了�
 
 写了三个小脚本，每个脚本往前走一步：
 
-| 脚本 | 做的事情 |
-| --- | --- |
-| [step01_tool.py](step01_tool.py) | 用 `@tool` 定义 `echo` 和加法工具，查看工具名称、说明、参数，并手动调用 |
-| [step02_agent_loop.py](step02_agent_loop.py) | 用 `create_agent` 跑通一次工具调用，打印消息过程 |
-| [step03_virtual_fs.py](step03_virtual_fs.py) | 换成 `create_deep_agent`，接入 `echo`，看看 Deep Agent 自带哪些工具 |
+
+| 脚本                                         | 做的事情                                                               |
+| -------------------------------------------- | ---------------------------------------------------------------------- |
+| [step01_tool.py](step01_tool.py)             | 用`@tool` 定义 `echo` 和加法工具，查看工具名称、说明、参数，并手动调用 |
+| [step02_agent_loop.py](step02_agent_loop.py) | 用`create_agent` 跑通一次工具调用，打印消息过程                        |
+| [step03_virtual_fs.py](step03_virtual_fs.py) | 换成`create_deep_agent`，接入 `echo`，看看 Deep Agent 自带哪些工具     |
 
 ### 1.3 跑出来的结果
 
@@ -48,12 +50,13 @@ add_tool.invoke({"num1": 1, "num2": 2})  # 工具对象，结果也是 3
 
 第二个脚本跑出了四条消息：
 
-| 消息 | 我看到的内容 |
-| --- | --- |
-| `HumanMessage` | 用户输入 `hi` |
-| `AIMessage` | 请求调用 `echo`，参数是 `{"text": "你好"}`，调用编号是 `call-1` |
-| `ToolMessage` | 工具返回 `echo: 你好`，`tool_call_id` 也是 `call-1` |
-| `AIMessage` | 回复 `调用已结束` |
+
+| 消息           | 我看到的内容                                                   |
+| -------------- | -------------------------------------------------------------- |
+| `HumanMessage` | 用户输入`hi`                                                   |
+| `AIMessage`    | 请求调用`echo`，参数是 `{"text": "你好"}`，调用编号是 `call-1` |
+| `ToolMessage`  | 工具返回`echo: 你好`，`tool_call_id` 也是 `call-1`             |
+| `AIMessage`    | 回复`调用已结束`                                               |
 
 第三个脚本里，自己只传了一个 `echo`，模型却收到了 9 个工具：
 
@@ -80,7 +83,7 @@ ls / read_file / write_file / edit_file / delete / glob / grep / task / echo
 
 这一步用的是预设回复的假模型，适合先熟悉调用过程。接下来换真实模型，看看它会不会自己选择我的工具。
 
-## 二、Basic：把自己的工具接进主应用
+## 二、Basic
 
 ### 2.1 我想验证什么
 
@@ -126,12 +129,13 @@ GET http://127.0.0.1:18088/agent/health → 200
 
 把课程中的四个概念放回代码里看，就具体多了：
 
-| 概念 | 项目里对应的地方 | 我的理解 |
-| --- | --- | --- |
-| 模型 | `demo_binding.py` 的 `settings.require_model()`，配置来自 `.env` | 负责理解输入、选择工具和组织回复；这次使用 Qwen3-Coder |
-| 工具 | `count_num`、`outline_answer`，通过 `tools=[...]` 接入 | 真正完成具体操作的函数 |
-| Middleware | `middleware=[TodoListMiddleware()]`，以及 Deep Agent 自带的中间件 | 给 Agent 增加能力，比如待办、文件操作和子 Agent |
-| Backend | 没有手动设置，默认使用 `StateBackend` | 这里的虚拟文件放在 Agent 状态里 |
+
+| 概念       | 项目里对应的地方                                                  | 我的理解                                               |
+| ---------- | ----------------------------------------------------------------- | ------------------------------------------------------ |
+| 模型       | `demo_binding.py` 的 `settings.require_model()`，配置来自 `.env`  | 负责理解输入、选择工具和组织回复；这次使用 Qwen3-Coder |
+| 工具       | `count_num`、`outline_answer`，通过 `tools=[...]` 接入            | 真正完成具体操作的函数                                 |
+| Middleware | `middleware=[TodoListMiddleware()]`，以及 Deep Agent 自带的中间件 | 给 Agent 增加能力，比如待办、文件操作和子 Agent        |
+| Backend    | 没有手动设置，默认使用`StateBackend`                              | 这里的虚拟文件放在 Agent 状态里                        |
 
 还有一个发现：`tools=[...]` 里写的两个工具，并不是模型手里的全部工具。Deep Agent 的中间件还会加进其他工具。
 相比 Lite 的 9 个工具，主应用多了一个自定义工具，以及 `TodoListMiddleware` 提供的 `write_todos`。
@@ -140,7 +144,7 @@ GET http://127.0.0.1:18088/agent/health → 200
 
 再通过 AG-UI 网关发一次完整请求，并试试文件读写工具，让 Middleware 和 Backend 的作用更直观。
 
-## 三、Advanced：换几种输入看看
+## 三、Advanced
 
 ### 3.1 我想验证什么
 
@@ -152,11 +156,12 @@ GET http://127.0.0.1:18088/agent/health → 200
 
 ### 3.3 跑出来的结果
 
-| 输入 | 模型调用的工具 | 返回结果 |
-| --- | --- | --- |
-| 统计「今天天气不错」 | `count_num` | `6` |
-| 空字符串 `""` | `write_todos` | 更新了待办列表 |
-| 长文本 | `count_num` | `540` |
+
+| 输入                 | 模型调用的工具 | 返回结果       |
+| -------------------- | -------------- | -------------- |
+| 统计「今天天气不错」 | `count_num`    | `6`            |
+| 空字符串`""`         | `write_todos`  | 更新了待办列表 |
+| 长文本               | `count_num`    | `540`          |
 
 这里的数字是工具收到的 `text` 的字符数。例如正常请求中，工具统计的是「今天天气不错」这段正文，返回 `6`。
 
