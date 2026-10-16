@@ -91,7 +91,7 @@ ls / read_file / write_file / edit_file / delete / glob / grep / task / echo
 
 ### 2.2 我做了什么
 
-在 AgentSeek 模板生成的 `my_deepagent` 项目中，找到 [demo_binding.py](../my_deepagent/src/my_deepagent/demo_binding.py)，加了一个字符统计工具：
+在 AgentSeek 模板生成的 `my_deepagent` 项目中，找到 [demo_binding.py](../../my_deepagent/src/my_deepagent/demo_binding.py)，加了一个字符统计工具：
 
 ```python
 def count_num(text: str) -> int:
@@ -197,12 +197,12 @@ GET http://127.0.0.1:18088/agent/health → 200
 ```powershell
 cd deepagents-practice
 uv sync --frozen
-.\.venv\Scripts\python.exe -X utf8 step01_tool.py
-.\.venv\Scripts\python.exe -X utf8 step02_agent_loop.py
-.\.venv\Scripts\python.exe -X utf8 step03_virtual_fs.py
+.\.venv\Scripts\python.exe -X utf8 task01-tool-agent\step01_tool.py
+.\.venv\Scripts\python.exe -X utf8 task01-tool-agent\step02_agent_loop.py
+.\.venv\Scripts\python.exe -X utf8 task01-tool-agent\step03_virtual_fs.py
 ```
 
-主应用的启动方式和请求样例见 [README](../README.md)，配置参考 [.env.example](../my_deepagent/.env.example)。
+主应用的启动方式和请求样例见 [README](../../README.md)，配置参考 [.env.example](../../my_deepagent/.env.example)。
 
 本次环境：Windows / Python 3.12。Lite 使用 deepagents 0.7.22，主应用使用 0.7.8，两个项目各用自己的 `.venv`。
 

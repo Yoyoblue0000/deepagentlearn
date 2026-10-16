@@ -1,36 +1,42 @@
-# DeepAgents in Action · Task 1
+# DeepAgents in Action
 
-第 1–2 章作业：**我的第一个工具 Agent**（目标档次：Advanced 挑战级）
+《Deep Agents 实战》课程作业记录。**每个 Task 一个子目录**，各自带自己的打卡与实验脚本。
 
-**打卡记录 → [`deepagents-practice/CHECKIN.md`](deepagents-practice/CHECKIN.md)**
+| Task | 章节 | 主题 | 打卡 |
+| --- | --- | --- | --- |
+| Task 1 | 第 1–2 章 | 我的第一个工具 Agent | [打卡记录](deepagents-practice/task01-tool-agent/CHECKIN.md) |
+| Task 2 | 第 3 章 | 让成果留在文件里（虚拟文件系统） | 进行中 |
 
 ## 目录
 
 ```
-deepagents-practice/          Lite 部分
-  step01_tool.py              用 @tool 定义工具，检查工具对象的 name / description / args
-  step02_agent_loop.py        create_agent 跑通 human → ai → tool → ai 四段消息
-  step03_virtual_fs.py        第一个 Deep Agent（create_deep_agent），9 个工具
-  CHECKIN.md                  打卡记录（五段式）
+deepagents-practice/                  实验脚本（两个 Task 共用同一套环境）
+  task01-tool-agent/                  Task 1
+    CHECKIN.md                        打卡记录
+    step01_tool.py                    用 @tool 定义工具，检查工具对象的 name / description / args
+    step02_agent_loop.py              create_agent 跑通 human → ai → tool → ai 四段消息
+    step03_virtual_fs.py              第一个 Deep Agent（create_deep_agent），9 个工具
+  task02-virtual-file-system/         Task 2
+    （进行中）
+  pyproject.toml / uv.lock            依赖版本已锁死，与课程一致
 
-my_deepagent/                 Basic / Advanced 部分
-  由 agentseek create 的 deepagents/default 模板生成
+my_deepagent/                         主应用，由 agentseek create 的 deepagents/default 模板生成
   src/my_deepagent/demo_binding.py    新增自定义工具 count_num，挂进 tools=[]
   .agentseek/lifecycle.toml           声明 AG-UI 网关的启动命令与健康检查
 ```
 
 ## 运行
 
-### Lite：三个实验脚本
+### Lite：实验脚本
 
 不需要 API Key（用的是脚本模型）。
 
 ```powershell
 cd deepagents-practice
 uv sync
-.\.venv\Scripts\python.exe step01_tool.py
-.\.venv\Scripts\python.exe step02_agent_loop.py
-.\.venv\Scripts\python.exe step03_virtual_fs.py
+.\.venv\Scripts\python.exe task01-tool-agent\step01_tool.py
+.\.venv\Scripts\python.exe task01-tool-agent\step02_agent_loop.py
+.\.venv\Scripts\python.exe task01-tool-agent\step03_virtual_fs.py
 ```
 
 ### Basic：启动主应用（AG-UI 网关）
@@ -67,4 +73,4 @@ Invoke-RestMethod http://127.0.0.1:18088/agent/health
 }
 ```
 
-响应是 SSE 流。完整调用链、输入对比与 Trace 证据见 [打卡报告](deepagents-practice/CHECKIN.md)。
+响应是 SSE 流。完整调用链、输入对比与 Trace 证据见 [Task 1 打卡报告](deepagents-practice/task01-tool-agent/CHECKIN.md)。
