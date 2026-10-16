@@ -17,7 +17,8 @@ deepagents-practice/                  实验脚本（两个 Task 共用同一套
     step02_agent_loop.py              create_agent 跑通 human → ai → tool → ai 四段消息
     step03_virtual_fs.py              第一个 Deep Agent（create_deep_agent），9 个工具
   task02-virtual-file-system/         Task 2
-    （进行中）
+    step04_vfs.py                     写文件并从 Agent 状态里取回；确认磁盘上没有
+  knowledge_notes.md / notes/         跨任务知识点笔记（索引 + 分类正文）
   pyproject.toml / uv.lock            依赖版本已锁死，与课程一致
 
 my_deepagent/                         主应用，由 agentseek create 的 deepagents/default 模板生成
