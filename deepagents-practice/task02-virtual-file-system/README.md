@@ -14,6 +14,19 @@
 | Advanced | 挑两种 Backend 做对比（如 State 与 Filesystem 的生命周期差异），或验证文件覆盖前后的差别，留下可复现记录 |
 | 学有余力 | 再加一种后端（Store 或沙箱）做三角对比 |
 
-## 状态
+## 打卡
 
-进行中 —— 实验脚本与打卡记录待产出。
+**Lite 打卡级** → [`CHECKIN.md`](CHECKIN.md)
+
+本次只做 Lite，Basic / Advanced / 学有余力 未做。
+
+## 本次用到的脚本
+
+| 脚本 | 做什么 | 后端 |
+| --- | --- | --- |
+| [`step04_vfs.py`](step04_vfs.py) | 写一个文件，从 Agent 状态里读回来 —— 磁盘上找不到 | 默认 `StateBackend` |
+| [`step05_filesystem.py`](step05_filesystem.py) | 写入 → 读回 → 修改，产物落到项目目录 | `FilesystemBackend` |
+
+两个脚本只差一行 `backend=...`。
+
+产物：[`agent_workspace/report.md`](agent_workspace/report.md)（脚本生成的真文件，作为证据提交）

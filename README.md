@@ -5,7 +5,7 @@
 | Task | 章节 | 主题 | 打卡 |
 | --- | --- | --- | --- |
 | Task 1 | 第 1–2 章 | 我的第一个工具 Agent | [打卡记录](deepagents-practice/task01-tool-agent/CHECKIN.md) |
-| Task 2 | 第 3 章 | 让成果留在文件里（虚拟文件系统） | 进行中 |
+| Task 2 | 第 3 章 | 让成果留在文件里（虚拟文件系统） | [Lite 打卡](deepagents-practice/task02-virtual-file-system/CHECKIN.md) |
 
 ## 目录
 
@@ -16,8 +16,11 @@ deepagents-practice/                  实验脚本（两个 Task 共用同一套
     step01_tool.py                    用 @tool 定义工具，检查工具对象的 name / description / args
     step02_agent_loop.py              create_agent 跑通 human → ai → tool → ai 四段消息
     step03_virtual_fs.py              第一个 Deep Agent（create_deep_agent），9 个工具
-  task02-virtual-file-system/         Task 2
-    step04_vfs.py                     写文件并从 Agent 状态里取回；确认磁盘上没有
+  task02-virtual-file-system/         Task 2（Lite）
+    CHECKIN.md                        打卡记录
+    step04_vfs.py                     默认后端：文件写进 Agent 状态，磁盘上找不到
+    step05_filesystem.py              换成 FilesystemBackend：写入 → 读回 → 修改，产物落磁盘
+    agent_workspace/report.md         上述脚本生成的产物（真文件）
   knowledge_notes.md / notes/         跨任务知识点笔记（索引 + 分类正文）
   pyproject.toml / uv.lock            依赖版本已锁死，与课程一致
 
