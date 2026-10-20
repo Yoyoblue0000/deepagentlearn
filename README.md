@@ -6,11 +6,12 @@
 | --- | --- | --- | --- |
 | Task 1 | 第 1–2 章 | 我的第一个工具 Agent | [打卡记录](deepagents-practice/task01-tool-agent/CHECKIN.md) |
 | Task 2 | 第 3 章 | 让成果留在文件里（虚拟文件系统） | [Lite 打卡](deepagents-practice/task02-virtual-file-system/CHECKIN.md) |
+| Task 3 | 第 4 章 | 让项目按计划完成（任务规划与 Todo） | [Lite 打卡](deepagents-practice/task03-task-planning/CHECKIN.md) |
 
 ## 目录
 
 ```
-deepagents-practice/                  实验脚本（两个 Task 共用同一套环境）
+deepagents-practice/                  实验脚本（各 Task 共用同一套环境）
   task01-tool-agent/                  Task 1
     CHECKIN.md                        打卡记录
     step01_tool.py                    用 @tool 定义工具，检查工具对象的 name / description / args
@@ -21,6 +22,9 @@ deepagents-practice/                  实验脚本（两个 Task 共用同一套
     step04_vfs.py                     默认后端：文件写进 Agent 状态，磁盘上找不到
     step05_filesystem.py              换成 FilesystemBackend：写入 → 读回 → 修改，产物落磁盘
     agent_workspace/report.md         上述脚本生成的产物（真文件）
+  task03-task-planning/               Task 3（Lite）
+    CHECKIN.md                        打卡记录
+    step06_todo_plan.py               显式启用 TodoListMiddleware，观察计划 pending → completed
   knowledge_notes.md / notes/         跨任务知识点笔记（索引 + 分类正文）
   pyproject.toml / uv.lock            依赖版本已锁死，与课程一致
 
@@ -41,6 +45,9 @@ uv sync
 .\.venv\Scripts\python.exe task01-tool-agent\step01_tool.py
 .\.venv\Scripts\python.exe task01-tool-agent\step02_agent_loop.py
 .\.venv\Scripts\python.exe task01-tool-agent\step03_virtual_fs.py
+.\.venv\Scripts\python.exe task02-virtual-file-system\step04_vfs.py
+.\.venv\Scripts\python.exe task02-virtual-file-system\step05_filesystem.py
+.\.venv\Scripts\python.exe task03-task-planning\step06_todo_plan.py
 ```
 
 ### Basic：启动主应用（AG-UI 网关）

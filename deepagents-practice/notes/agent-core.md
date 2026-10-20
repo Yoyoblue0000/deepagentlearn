@@ -295,3 +295,49 @@
   ```
 
 - 踩坑点：「工具返回 success」只说明工具执行了，**不说明文件落在你想要的地方**。
+
+## 任务规划（Todo）
+
+### `write_todos` 是「整份替换」，不是「逐项修改」
+
+- **一句话结论**：每次调用 `write_todos` 都会用一个新列表覆盖状态里的 `todos`；状态里永远只有最新一版，旧版只能在消息链里找。
+- **为什么**：工具入参就是 `{"todos": [...]}`，没有「只改第几项」这种接口。框架收到什么就整体写进 `todos`。
+- **示例**：
+
+  ```python
+  # 第一次：全部 pending
+  {"todos": [{"content": "统计字数", "status": "pending"}, ...]}
+  # 第二次：整份重新提交，而不是「把第 1 项改成 in_progress」
+  {"todos": [{"content": "统计字数", "status": "in_progress"}, ...]}
+  ```
+
+- **踩坑点**：想回看「计划是怎么变的」，不能只看最终 `result["todos"]`；要遍历消息链里每次 `write_todos` 的 `args["todos"]`。
+
+### `todos` 是独立的状态字段，和 `messages` 分开管
+
+- **一句话结论**：启用 `TodoListMiddleware` 后，Agent State 多出 `todos` 字段；它不混在消息历史里。
+- **为什么**：教案的设计意图是给长任务一个「进度锚点」——对话被总结压缩时，清单仍在单独的字段里。这是框架层的安排，不是模型自觉。
+- **示例**：
+
+  ```python
+  result.keys()            # dict_keys(['messages', 'files', 'todos'])
+  result["todos"]          # [{'content': ..., 'status': 'completed'}, ...]
+  ```
+
+- **踩坑点**：`todos` 只在**成功调用过** `write_todos` 后才有内容；不挂中间件、或模型本轮没列计划，这个键就不出现。跨次 `invoke()` 要接续清单，还得配 Checkpointer + 同一个 `thread_id`。
+
+### v0.7 的可选能力靠中间件显式加入
+
+- **一句话结论**：`write_todos` 不是 Deep Agent 默认工具；要在 `create_deep_agent(..., middleware=[TodoListMiddleware()])` 里显式加。
+- **为什么**：v0.7 把 Todo 从默认配置改成了可选策略，由任务和产品需求决定是否启用。中间件同时注入工具、状态字段和规划提示词。
+- **示例**：
+
+  ```python
+  from langchain.agents.middleware import TodoListMiddleware
+
+  agent = create_deep_agent(model=model, middleware=[TodoListMiddleware()])
+  # 直接读注册表做对照，不用猜：
+  sorted(agent.nodes["tools"].bound.tools_by_name)
+  ```
+
+- **踩坑点**：`middleware=[...]` 里若传入同名实例，会**原位置换**默认实例，而不是叠加或逐字段合并。判断「能力从哪来」最直接的办法是看工具注册表的差集。

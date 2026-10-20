@@ -127,3 +127,34 @@
 
 - 踩坑点：`validate_path` 还会**拒绝 Windows 绝对路径**（`C:/`、`F:/`），
   因为虚拟路径体系里不允许出现真实盘符。
+
+### 想看清「每一步状态怎么变」，用 `stream_mode="values"`
+
+- **一句话结论**：`agent.invoke()` 只给最终状态；`agent.stream(..., stream_mode="values")` 每执行完一个图节点就吐一份完整状态，适合观察状态流转。
+- **为什么**：`invoke` 把中间过程收起来了。`values` 模式相当于在每一步后拍一张快照，比较相邻两张就能看到哪个字段变了。
+- **示例**：
+
+  ```python
+  previous = None
+  for snapshot in agent.stream(inputs, stream_mode="values"):
+      todos = snapshot.get("todos") or []
+      if todos and todos != previous:      # 只在变化时打印
+          print(todos)
+          previous = todos
+  ```
+
+- **踩坑点**：第一份快照是输入状态，`todos` 还不存在；要过滤空值，否则会多打一版「空计划」。
+
+### 进度标记不是结果验证：`completed` ≠ 做对了
+
+- **一句话结论**：`write_todos` 的 `completed` 只是 Agent 自己写的进度标记，不能当作验收通过；产物要另外断言。
+- **为什么**：模型可以跳过步骤、写错内容，仍然把清单标成全部完成。教案明确说 `completed` 是「Agent 写入的进度标记」，应用仍需检查产物。
+- **示例**：
+
+  ```python
+  assert all(t["status"] == "completed" for t in result["todos"])   # 只证明它这么标了
+  assert result["files"][REPORT_PATH]["content"] == EXPECTED        # 这才证明产物对
+  assert EXPECTED.strip() in read_back_message.content              # 读回也要核对
+  ```
+
+- **踩坑点**：别把「清单全绿」当成验收报告。计划项应逐条对应一个可检查的事实：文件在不在、内容对不对、引用能不能核实。
