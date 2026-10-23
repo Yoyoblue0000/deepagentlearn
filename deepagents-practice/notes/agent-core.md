@@ -341,3 +341,72 @@
   ```
 
 - **踩坑点**：`middleware=[...]` 里若传入同名实例，会**原位置换**默认实例，而不是叠加或逐字段合并。判断「能力从哪来」最直接的办法是看工具注册表的差集。
+
+## 子 Agent（Subagent）
+
+### 子 Agent 就是一个字典：`name` / `description` / `system_prompt`
+
+- **一句话结论**：用 `subagents=[{...}]` 声明子 Agent，三个必填字段分别是名字、用途、它自己的指令；主 Agent 通过 `task(subagent_type=名字)` 调它。
+- **为什么**：`description` 是主 Agent 决策路由的唯一依据，写得越具体越容易被选对；`system_prompt` 不继承主 Agent，必须独立定义。
+- **示例**：
+
+  ```python
+  researcher = {
+      "name": "researcher",
+      "description": "研究本地案例，比较方案并把带证据的报告写入文件",
+      "system_prompt": "你是研究员。先 lookup_case，再 write_file，最后只返回结论。",
+      "tools": [lookup_case],
+  }
+  agent = create_deep_agent(model=model, subagents=[researcher])
+  ```
+
+- **踩坑点**：不传 `subagents` 也有一个 `general-purpose` 子 Agent 可用；它继承主 Agent 的 prompt / tools / model，是唯一的例外。
+
+### `tools` 是「完全替换」，不是「合并」
+
+- **一句话结论**：子 Agent 显式写了 `tools`，就**不再继承**主 Agent 的任何自定义工具；想让它用某个工具，必须自己再写一遍。
+- **为什么**：教案写的是「显式指定后完全替换（不合并）」。这个规则配合最小权限原则，避免子 Agent 拿到不该有的能力。
+- **示例**：
+
+  ```python
+  # 主 Agent: tools=[draft_outline]
+  # 子 Agent: tools=[lookup_case]
+  # 运行时对照：
+  #   主 Agent：... draft_outline ... / 子 Agent：... lookup_case ...（没有 draft_outline）
+  ```
+
+- **踩坑点**：误以为是合并，就会以为子 Agent 能用主 Agent 的工具；实际会直接缺工具、调用失败。验证办法是在模型 `bind_tools` 里打印工具名。
+
+### 上下文隔离 ≠ 文件隔离
+
+- **一句话结论**：子 Agent 的中间工具调用**不会**进入主 Agent 的 `messages`；但共用 Backend 时，它写的文件**会**出现在主 Agent 的 `files` 状态里。
+- **为什么**：`task` 只把子 Agent 的最终回复包成一条 `ToolMessage` 返回；文件走的是 Backend 的状态通道，不经过消息。
+- **示例**：
+
+  ```python
+  result = agent.invoke({"messages": [{"role": "user", "content": "交给 researcher ..."}]})
+  [m.name for m in result["messages"] if m.type == "tool"]   # ['task']
+  sorted(result["files"])                                     # ['/research/xxx.md']
+  ```
+
+- **踩坑点**：文件在状态里，不等于主 Agent「看到」了正文 —— 要它自己 `read_file`，正文才进上下文。这是两件事。
+
+### 子 Agent 的过程只能靠外部记录取证
+
+- **一句话结论**：想证明子 Agent 真的调了某个工具，不能在主 Agent 消息里找，要在工具内部往外部列表记一笔。
+- **为什么**：隔离的目的就是不让这些记录回到主 Agent；只看子 Agent 的自我总结，等于信它的自述。
+- **示例**：
+
+  ```python
+  trace = []
+
+  @tool
+  def lookup_case(case_id: str) -> str:
+      """读取固定资料。"""
+      trace.append(case_id)
+      return MATERIAL
+
+  # 跑完断言：assert trace，而不是 assert "查过了" in result["messages"][-1].content
+  ```
+
+- **踩坑点**：这和「`completed` 不等于做对了」是同一条原则 —— **要证据，不要自述**。
