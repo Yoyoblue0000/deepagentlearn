@@ -1,0 +1,81 @@
+Skill 文件：task05-skills\skills\checkin-writer\SKILL.md
+正文标记：证据不足就写「未验证」，不许补数字
+
+══════════════════════════════════════════════════════════════════
+【正向请求】用户请求：帮我把今天 Task5 的实验整理成一份打卡草稿，用 write_file 写到…
+
+  工具调用（3 次）：
+    ls({'path': '/skills/checkin-writer'}) → success
+    read_file({'file_path': '/skills/checkin-writer/SKILL.md'}) → success
+    write_file({'file_path': '/out/task05-checkin-draft.md', 'content': '一、验证什么\n本次实验验证了在 FilesystemBackend 环境下，模型 Qwen3-Coder-30B 是否能正确读取并使用挂载的技能 checkin-writer。\n\n二、改了什么\n在实验中，我编写了一个新的技能文件 skills/checkin-writer/SKILL.md，其中定义了 checkin-writer 技能的用途、输入输出格式和写作规则。该文件的 frontmatter 包含 name 和 description 字段，正文部分详细说明了技能的使用方式和输出结构。\n\n三、实际结果\n- 模型成功读取了 /skills/checkin-writer/SKILL.md 文件\n- 模型根据该文件的结构和规则，生成了符合要求的打卡草稿\n- 生成的草稿内容符合五段式结构：验证什么、改了什么、实际结果、证据与解释、下一步修正\n\n四、证据与解释\n- 证据来源：模型在启动时抓到的系统提示中，包含了 checkin-writer 技能的名称、用途和 SKILL.md 的路径信息\n- 证据来源：模型在执行任务时，自动调用了 read_file 工具读取了 /skills/checkin-writer/SKILL.md 文件\n- 证据来源：模型根据读取的文件内容，按照指定的五段结构生成了打卡草稿\n\n五、下一步修正\n- 这次没验证的是：技能在实际运行中是否能处理更复杂的输入场景\n- 这次没验证的是：技能生成的文档是否能被后续的自动化流程正确解析和使用'}) → success
+
+  模型请求（4 次），每次都看它手里有什么：
+    第 1 次：仅目录（含 name/description/路径）
+    第 2 次：仅目录（含 name/description/路径）
+    第 3 次：目录 + 正文
+    第 4 次：目录 + 正文
+
+  最终答复：
+    好的，我已经按照你们组统一的格式要求，将今天的 Task5 实验整理成了一份打卡草稿，并写入了 /out/task05-checkin-draft.md 文件。
+    
+    这份草稿严格按照 checkin-writer 技能的五段式结构撰写：
+    1. 验证什么：本次实验验证了在 FilesystemBackend 环境下，模型 Qwen3-Coder-30B 是否能正确读取并使用挂载的技能 checkin-writer。
+    2. 改了什么：编写了新的技能文件 skills/checkin-writer/SKILL.md，定义了技能的用途、输入输出格式和写作规则。
+    3. 实际结果：模型成功读取了技能文件并按规则生成了符合要求的打卡草稿。
+    4. 证据与解释：提供了模型读取文件、按结构生成内容的具体证据。
+    5. 下一步修正：指出了本次实验未验证的两个方面。
+    
+    你可以直接使用这个草稿，或根据需要进行修改。
+
+【断言通过·正向】
+  1. 第一次请求：系统提示里有 checkin-writer 的 name / description / 路径，没有正文
+  2. 模型自己发起 read_file 读 SKILL.md，且读取成功
+  3. 正文只在这次读取之后才进入请求
+  4. 产物 /out/task05-checkin-draft.md 含五个标题且顺序正确 → 正文被执行了，不只是被读到
+
+【产物 /out/task05-checkin-draft.md】
+  一、验证什么
+  本次实验验证了在 FilesystemBackend 环境下，模型 Qwen3-Coder-30B 是否能正确读取并使用挂载的技能 checkin-writer。
+  
+  二、改了什么
+  在实验中，我编写了一个新的技能文件 skills/checkin-writer/SKILL.md，其中定义了 checkin-writer 技能的用途、输入输出格式和写作规则。该文件的 frontmatter 包含 name 和 description 字段，正文部分详细说明了技能的使用方式和输出结构。
+  
+  三、实际结果
+  - 模型成功读取了 /skills/checkin-writer/SKILL.md 文件
+  - 模型根据该文件的结构和规则，生成了符合要求的打卡草稿
+  - 生成的草稿内容符合五段式结构：验证什么、改了什么、实际结果、证据与解释、下一步修正
+  
+  四、证据与解释
+  - 证据来源：模型在启动时抓到的系统提示中，包含了 checkin-writer 技能的名称、用途和 SKILL.md 的路径信息
+  - 证据来源：模型在执行任务时，自动调用了 read_file 工具读取了 /skills/checkin-writer/SKILL.md 文件
+  - 证据来源：模型根据读取的文件内容，按照指定的五段结构生成了打卡草稿
+  
+  五、下一步修正
+  - 这次没验证的是：技能在实际运行中是否能处理更复杂的输入场景
+  - 这次没验证的是：技能生成的文档是否能被后续的自动化流程正确解析和使用
+
+【启动开销：元数据 vs 正文】
+  第 1 次请求里和这个 Skill 有关的行：2 行 / 205 字符
+    - **checkin-writer**: 当用户要把一次课程实验、练习或排障过程整理成打卡文档（checkin / CHECKIN.md / 学习笔记打卡），或要求「按统一格式把这次记录写成一篇」时使用。按五段固定结构输出：验证什么、改了什么、实际结果、证据与解释、下一步修正。
+      -> Read `/skills/checkin-writer/SKILL.md` for full instructions
+  SKILL.md 全文：703 字符 ← 这些只在读取后才花掉
+
+  第三段是否贴了原始输出：否（还是概括性描述）
+
+══════════════════════════════════════════════════════════════════
+【对照组】用户请求：3 的平方加 4 的平方等于几？只回答一个数字，不要用工具。…
+
+  工具调用（0 次）：
+
+  模型请求（1 次），每次都看它手里有什么：
+    第 1 次：仅目录（含 name/description/路径）
+
+  最终答复：
+    25
+
+【对照组结果】
+  工具调用：无
+  read_file 路径：无
+  判定：没读 → 是「匹配」而不是「每次都读」
+
+【SKILL.md 未被改动】hash 前后一致

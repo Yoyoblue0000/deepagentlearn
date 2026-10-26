@@ -8,6 +8,7 @@
 | Task 2 | 第 3 章 | 让成果留在文件里（虚拟文件系统） | [Lite 打卡](deepagents-practice/task02-virtual-file-system/CHECKIN.md) |
 | Task 3 | 第 4 章 | 让项目按计划完成（任务规划与 Todo） | [Lite 打卡](deepagents-practice/task03-task-planning/CHECKIN.md) |
 | Task 4 | 第 5 章 | 把一项工作交给子 Agent（上下文隔离） | [Lite 打卡](deepagents-practice/task04-subagents/CHECKIN.md) |
+| Task 5 | 第 7 章 | 把经验做成可复用的 Skill | [Lite 打卡](deepagents-practice/task05-skills/CHECKIN.md) |
 
 ## 目录
 
@@ -29,6 +30,12 @@ deepagents-practice/                  实验脚本（各 Task 共用同一套环
   task04-subagents/                   Task 4（Lite）
     CHECKIN.md                        打卡记录
     step07_subagent_delegation.py     声明 researcher 子 Agent，验证消息 / 文件 / 工具集三条边界
+  task05-skills/                      Task 5（Lite）
+    CHECKIN.md                        打卡记录
+    skills/checkin-writer/SKILL.md    本次的 Skill：把实验记录整理成五段式打卡文档
+    step08_skill_matching.py          真实模型验证匹配：正向请求 + 无关请求对照
+    out/task05-checkin-draft.md       Agent 按 Skill 正文写出的产物
+    runs/                             第 2、3 次运行的终端日志
   knowledge_notes.md / notes/         跨任务知识点笔记（索引 + 分类正文）
   pyproject.toml / uv.lock            依赖版本已锁死，与课程一致
 
@@ -41,7 +48,8 @@ my_deepagent/                         主应用，由 agentseek create 的 deepa
 
 ### Lite：实验脚本
 
-不需要 API Key（用的是脚本模型）。
+Task 1–4 不需要 API Key（用的是脚本模型）。Task 5 例外：匹配必须用真实模型，
+它读 `my_deepagent/.env` 里的 `BUB_*` 配置。
 
 ```powershell
 cd deepagents-practice
@@ -53,6 +61,7 @@ uv sync
 .\.venv\Scripts\python.exe task02-virtual-file-system\step05_filesystem.py
 .\.venv\Scripts\python.exe task03-task-planning\step06_todo_plan.py
 .\.venv\Scripts\python.exe task04-subagents\step07_subagent_delegation.py
+.\.venv\Scripts\python.exe -X utf8 task05-skills\step08_skill_matching.py   # 需要真实模型
 ```
 
 ### Basic：启动主应用（AG-UI 网关）

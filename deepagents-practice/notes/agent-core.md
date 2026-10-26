@@ -410,3 +410,60 @@
   ```
 
 - **踩坑点**：这和「`completed` 不等于做对了」是同一条原则 —— **要证据，不要自述**。
+
+## Skill（渐进式披露）
+
+### `skills` 参数给的是父目录
+
+- **一句话结论**：`skills=["/skills/"]` 对应 `/skills/<name>/SKILL.md`；传 `SKILL.md` 的路径不报错，但什么也发现不了。
+- **为什么**：中间件扫描的是「目录下的子目录」，每个子目录按 `SKILL.md` 解析 frontmatter；文件名固定，路径只指到父目录。
+- **示例**：
+
+  ```python
+  create_deep_agent(backend=FilesystemBackend(root_dir="./proj", virtual_mode=True),
+                    skills=["/skills/"])          # ✅ /skills/checkin-writer/SKILL.md
+  # skills=["/skills/checkin-writer/SKILL.md"]     # ❌ 技能不加载，只留一条 warning
+  ```
+
+- **踩坑点**：路径写错**不抛异常** —— 只有 stderr 一条 `Cannot load skills from ...` warning，
+  系统提示里变成「(No skills available yet)」，模型手上一个技能都没有。
+  它也不负责创建目录、不校验文件在不在。
+
+### 匹配只看 description
+
+- **一句话结论**：Agent 决定用不用某个 Skill，唯一依据是 `description`；正文在它决定要用之后才去读。
+- **为什么**：启动时系统提示里只有「name + description + 路径」两行，正文不在上下文里，模型根本没得选。
+- **示例**：
+
+  ```text
+  - **checkin-writer**: 当用户要把一次课程实验…整理成打卡文档…时使用。
+    -> Read `/skills/checkin-writer/SKILL.md` for full instructions
+  ```
+
+- **踩坑点**：description 写得泛（「处理各种任务」）就是漏召回 + 误召回双杀；写的触发词要对得上用户的原话。
+
+### `ls` 不算读到，正文随 `read_file` 才进上下文
+
+- **一句话结论**：`ls` 只返回文件名，不触发披露；正文要等 `read_file` 的 `ToolMessage` 回到上下文才出现。
+- **为什么**：内容进入上下文只有一条通道 —— 工具返回；目录列表里没有正文，自然带不进来。
+- **示例**：
+
+  ```text
+  第 1 次请求：仅目录      ← 启动
+  第 2 次请求：仅目录      ← 这次是 ls 的返回
+  第 3 次请求：目录 + 正文 ← read_file 之后
+  ```
+
+- **踩坑点**：数请求次数时要按「有没有正文」分段，别把 `ls` 那一轮当成「已经读到了」。
+
+### 改 SKILL.md 就是改行为
+
+- **一句话结论**：Skill 正文是运行时从 Backend 读的，改文本文件就改行为，不用改代码、不用重新装配 Agent。
+- **为什么**：代码里只写 `skills=["/skills/"]`，没有任何地方引用具体某个 Skill 的正文。
+- **示例**：
+
+  ```python
+  # 代码不变；改 skills/x/SKILL.md 的正文，下一次 invoke 生效
+  ```
+
+- **踩坑点**：反过来也成立 —— 同一份正文指不保证同一份产物。规则写得更严不等于模型照做，得看产物断言。
